@@ -1,0 +1,97 @@
+openapi: 3.1.0
+info:
+  title: Phone_API
+  version: '1.0'
+  description: This API defines the paths required to manipulate/retrieve phone details
+  contact:
+    url: ''
+    name: Anjali Nair
+    email: 89.anjalinair@gmail.com
+servers:
+  - url: 'http://localhost:8080'
+paths:
+  /contactmgmt/phoneNumbers:
+    get:
+      summary: Get Phone number details
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties: {}
+                x-examples:
+                  example-1:
+                    - {}
+              examples:
+                phoneNumbers:
+                  value:
+                    - number: '+61412222222'
+                      status: Active
+                    - number: '+61412222322'
+                      status: Active
+      operationId: get-contactmgmt-phoneNumbers
+      description: Get phone numbers for all customers or for a single customer
+      parameters:
+        - schema:
+            type: string
+          in: query
+          name: userId
+  '/contactmgmt/updateStatus/{number}/{status}':
+    parameters:
+      - schema:
+          type: string
+        name: number
+        in: path
+        required: true
+        description: Phone number whose status needs to be updated
+      - schema:
+          type: string
+        name: status
+        in: path
+        required: true
+        description: Status to which the number needs update(Active or Inactive)
+    patch:
+      summary: Update phone number status
+      operationId: patch-contactmgmt-activate-number-status
+      description: Activate or deactivate a phone number
+      responses:
+        '200':
+          description: Phone status updated
+        '400':
+          description: Invalid status - valid statuses are Active/Inactive
+        '404':
+          description: Invalid phone number
+  /contactmgmt/details:
+    get:
+      summary: Get all customer details from backend
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties: {}
+                x-examples:
+                  example-1:
+                    - {}
+              examples:
+                contact:
+                  value:
+                    - id: 1
+                      CustomerId: cust1
+                      FullName: Paul Stake
+                      PhoneNumber: '+61411111111'
+                      Status: Active
+      operationId: get-contactmgmt-getAll
+      description: Retrieves the whole set of information in the backend phone databas
+    parameters: []
+components:
+  schemas: {}

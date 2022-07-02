@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS PHONE_DATA;
+
+CREATE TABLE PHONE_DATA (
+  id INT AUTO_INCREMENT  PRIMARY KEY,
+  customer_id VARCHAR(250) NOT NULL,
+  full_name VARCHAR(250) NOT NULL,
+  number VARCHAR(250) NOT NULL,
+  status VARCHAR(25) NOT NULL CHECK ( status in ('Active', 'Inactive') )
+);
