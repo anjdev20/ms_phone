@@ -25,7 +25,7 @@ public class PhoneController {
      * - of a specific customer (by the use of optional query param)
      */
     @GetMapping(path = "/contactmgmt/phone-details")
-    public @ResponseBody ResponseEntity<List<PhoneDataResponse>> getAllPhone(@RequestParam(value = "custId", required = false) String custId) {
+    public @ResponseBody ResponseEntity<List<PhoneDataResponse>> getAllPhone(@RequestParam(value = "customer-id", required = false) String custId) {
         List<PhoneDataResponse> phoneDataResponse = phoneService.getPhoneForUser(custId);
         return new ResponseEntity<>(phoneDataResponse, HttpStatus.OK);
     }
@@ -35,13 +35,6 @@ public class PhoneController {
      */
     @PatchMapping(path = "/contactmgmt/phone-status/{number}/{status}")
     public @ResponseBody ResponseEntity activatePhone(@PathVariable("number") String number, @PathVariable("status") String status) {
-        int statusCode = phoneService.activatePhone(number, status);
-        if (statusCode == 1)
-            return new ResponseEntity("Invalid status - valid statuses are Active/Inactive", HttpStatus.BAD_REQUEST);
-
-        else if (statusCode == 2)
-            return new ResponseEntity("Phone number does not exist", HttpStatus.NOT_FOUND);
-
-        return new ResponseEntity("Phone status updated", HttpStatus.OK);
+        return (phoneService.activatePhone(number, status));
     }
 }

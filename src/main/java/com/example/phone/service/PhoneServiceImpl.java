@@ -40,6 +40,7 @@ public class PhoneServiceImpl implements PhoneService {
         /**Using a separate response object to send API response to make it more scalable*/
         List<PhoneData> phoneDataList = phoneDataRepository.findAll(Example.of(phoneData));
         List<PhoneDataResponse> phoneDataResponse = new ArrayList<>(phoneDataList.size());
+        log.info("Creating a new response object");
         for (PhoneData phone : phoneDataList) {
             phoneDataResponse.add(new PhoneDataResponse(phone.getId(), phone.getCustomerId(),
                     phone.getFullName(), phone.getNumber(), phone.getStatus()));
@@ -53,22 +54,24 @@ public class PhoneServiceImpl implements PhoneService {
      * else only a specific customer phone details are retrieved
      */
     @Override
-    public int activatePhone(String number, String status) {
+    public ResponseEntity activatePhone(String number, String status) {
         log.debug("Going to update status of phone number");
         //Check if phone number exists and status to be updated is valid
         PhoneData phoneData = phoneDataRepository.findByNumber(number);
         if (phoneData != null) {
             if (status.equals("Active") || status.equals("Inactive")) {
                 phoneDataRepository.updateStatus(status, number);
-                log.info("Status of phone number " + number + " updated to" + status);
-                //return success code
-                return 0;
-            } else
-                //return error code 1 for invalid status update request
-                return 1;
+                log.info("Status of phone number " + number + " updated to " + status);
+                //return success message
+                return new ResponseEntity("Phone status updated", HttpStatus.OK);
+            } else {
+                log.warn("Invalid status - valid statuses are Active/Inactive");
+                return new ResponseEntity("Invalid status - valid statuses are Active/Inactive", HttpStatus.BAD_REQUEST);
+            }
+
         }
-        //If phone number does not exist, return error code 2
-        log.info("Phone number does not exist");
-        return 2;
+        //If phone number does not exist
+        log.warn("Phone number does not exist");
+        return new ResponseEntity("Phone number does not exist", HttpStatus.NOT_FOUND);
     }
 }

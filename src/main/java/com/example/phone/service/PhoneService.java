@@ -12,5 +12,5 @@ import java.util.List;
 public interface PhoneService {
     List<PhoneDataResponse> getPhoneForUser(String userId);
 
-    int activatePhone(String number, String status);
+    ResponseEntity activatePhone(String number, String status);
 }

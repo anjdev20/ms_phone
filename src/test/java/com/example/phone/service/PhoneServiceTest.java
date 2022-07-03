@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PhoneServiceTest {
@@ -46,6 +47,46 @@ class PhoneServiceTest {
         List<PhoneDataResponse> phonesFromApi = phoneService.getPhoneForUser(null);
         Assertions.assertEquals(phonesFromDb.size(), phonesFromApi.size());
         Assertions.assertEquals(phonesFromDb.size(), phonesFromApi.size());
+    }
+
+    @Test
+    void testActivateValid() {
+        String number = "+61411111111";
+        String status = "Active";
+        PhoneData phoneData = getPhoneData();
+        Mockito.when(phoneDataRepository.findByNumber(any())).thenReturn(phoneData);
+        phoneService.activatePhone("+61411111111", "Active");
+        verify(phoneDataRepository, times(1)).updateStatus(any(), any());
+    }
+
+    @Test
+    void testActivateInvalidNumber() {
+        String number = "+1111";
+        String status = "Active";
+        Mockito.when(phoneDataRepository.findByNumber(any())).thenReturn(null);
+        phoneService.activatePhone(number, status);
+        verify(phoneDataRepository, never()).updateStatus(any(), any());
+    }
+
+    @Test
+    void testActivateInvalidStatus() {
+        String number = "+61411111111";
+        String status = "Activ";
+        PhoneData phoneData = getPhoneData();
+        Mockito.when(phoneDataRepository.findByNumber(any())).thenReturn(phoneData);
+        phoneService.activatePhone(number, status);
+        verify(phoneDataRepository, never()).updateStatus(any(), any());
+    }
+
+    protected PhoneData getPhoneData() {
+        PhoneData phoneData = new PhoneData();
+        phoneData.setId(1L);
+        phoneData.setCustomerId("cus1");
+        phoneData.setFullName("Paul Stake");
+        phoneData.setNumber("+61411111111");
+        phoneData.setStatus("Active");
+
+        return phoneData;
     }
 
 }

@@ -39,7 +39,8 @@ paths:
         - schema:
             type: string
           in: query
-          name: userId
+          name: customer-id
+          description: Customer Id to be looked up
     parameters: []
   '/contactmgmt/phone-status/{number}/{status}':
     parameters:

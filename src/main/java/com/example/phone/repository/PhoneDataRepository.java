@@ -13,7 +13,7 @@ public interface PhoneDataRepository extends JpaRepository<PhoneData, Long> {
     @Modifying
     @Transactional
     @Query(value = "update PhoneData p set p.status = :status where  p.number= :number")
-    ResponseEntity updateStatus(@Param(value = "status") String status, @Param(value = "number") String number);
+    int updateStatus(@Param(value = "number") String number, @Param(value = "status") String status);
 
     PhoneData findByNumber(String s);
 
