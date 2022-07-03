@@ -10,7 +10,7 @@ info:
 servers:
   - url: 'http://localhost:8080'
 paths:
-  /contactmgmt/phoneNumbers:
+  /contactmgmt/phone-details:
     get:
       summary: Get Phone number details
       responses:
@@ -40,7 +40,8 @@ paths:
             type: string
           in: query
           name: userId
-  '/contactmgmt/updateStatus/{number}/{status}':
+    parameters: []
+  '/contactmgmt/phone-status/{number}/{status}':
     parameters:
       - schema:
           type: string

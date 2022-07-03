@@ -1,8 +1,7 @@
 package com.example.phone.controller;
 
-import com.example.phone.repository.PhoneDataRepository;
-import com.example.phone.entity.PhoneData;
-import com.example.phone.entity.PhoneNumber;
+import com.example.phone.entity.PhoneDataResponse;
+import com.example.phone.service.PhoneService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,42 +10,37 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Controller class to map endpoints of the Phone microservice
+ */
 @RestController
 @Slf4j
 public class PhoneController {
-
     @Autowired
-    PhoneDataRepository phoneDataRepository;
+    private PhoneService phoneService;
 
-    @GetMapping(path = "/contactmgmt/details")
-    public @ResponseBody List<PhoneData> getAll() {
-        return phoneDataRepository.findAll();
+    /**
+     * GET request mapping to retrieve phone numbers in 2 ways
+     * - as a whole
+     * - of a specific customer (by the use of optional query param)
+     */
+    @GetMapping(path = "/contactmgmt/phone-details")
+    public @ResponseBody ResponseEntity<List<PhoneDataResponse>> getAllPhone(@RequestParam(value = "custId", required = false) String custId) {
+        return new ResponseEntity<>(phoneService.getPhoneForUser(custId), HttpStatus.OK);
     }
 
-    @GetMapping(path = "/contactmgmt/phoneNumbers")
-    public @ResponseBody List<PhoneNumber> getAllPhone(@RequestParam(value = "userId", required = false) String userId) {
-       if(userId == null)
-           return phoneDataRepository.findBy();
-       else
-           return phoneDataRepository.findByCustomerId(userId);
+    /**
+     * PATCH request mapping for partial update of row/resource
+     */
+    @PatchMapping(path = "/contactmgmt/phone-status/{number}/{status}")
+    public @ResponseBody ResponseEntity activatePhone(@PathVariable("number") String number, @PathVariable("status") String status) {
+        int statusCode = phoneService.activatePhone(number, status);
+        if (statusCode == 1)
+            return new ResponseEntity("Invalid status - valid statuses are Active/Inactive", HttpStatus.BAD_REQUEST);
+
+        else if (statusCode == 2)
+            return new ResponseEntity("Phone number does not exist", HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity("Phone status updated", HttpStatus.OK);
     }
-
-    @PatchMapping (path = "/contactmgmt/updateStatus/{number}/{status}")
-    public ResponseEntity activatePhone(@PathVariable("number") String number, @PathVariable ("status") String status) {
-
-       PhoneData phoneData=  phoneDataRepository.findByNumber(number);
-       if(phoneData != null) {
-           if (status.equals("Active") || status.equals("Inactive")) {
-
-               log.info("Updating phone number status");
-               phoneDataRepository.updateStatus(status, number);
-               return new ResponseEntity("Phone status updated", HttpStatus.OK);
-           }
-           else
-               return new ResponseEntity("Invalid status - valid statuses are Active/Inactive", HttpStatus.BAD_REQUEST);
-
-       }
-            return new ResponseEntity("Invalid phone number", HttpStatus.NOT_FOUND);
-    }
-
 }
