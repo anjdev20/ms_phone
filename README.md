@@ -1,6 +1,6 @@
 # ms_phone
 example microservice to retrieve phone numbers details
-
+API spec available at: src/main/java/com/example/phone/api/Phone_Details_API.yaml
 Run application: ./mvnw spring-boot:run
 
 # Curl commands to check endpoints
