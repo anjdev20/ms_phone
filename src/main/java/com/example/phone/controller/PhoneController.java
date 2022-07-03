@@ -26,7 +26,8 @@ public class PhoneController {
      */
     @GetMapping(path = "/contactmgmt/phone-details")
     public @ResponseBody ResponseEntity<List<PhoneDataResponse>> getAllPhone(@RequestParam(value = "custId", required = false) String custId) {
-        return new ResponseEntity<>(phoneService.getPhoneForUser(custId), HttpStatus.OK);
+        List<PhoneDataResponse> phoneDataResponse = phoneService.getPhoneForUser(custId);
+        return new ResponseEntity<>(phoneDataResponse, HttpStatus.OK);
     }
 
     /**
