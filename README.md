@@ -14,3 +14,10 @@ http://localhost:8080/h2-console/
 curl -X GET "http://localhost:8080/contactmgmt/phone-details"
 curl -X GET "http://localhost:8080/contactmgmt/phone-details?customer-id=cus1"
 curl -X PATCH "http://localhost:8080/contactmgmt/phone-status/+61411111111/Active"
+
+# Some invalid scenarios for patch
+# Invalid status
+curl -X PATCH "http://localhost:8080/contactmgmt/phone-status/+61411111111/Activ"
+# Non-existent number
+curl -X PATCH "http://localhost:8080/contactmgmt/phone-status/+6141111111/InActive"
+
