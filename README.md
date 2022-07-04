@@ -20,6 +20,3 @@ curl -X GET "http://localhost:8080/contactmgmt/phone-details?customer-id=xxx"
 curl -X PATCH "http://localhost:8080/contactmgmt/phone-status/+61411111111/Activ"
 curl -X PATCH "http://localhost:8080/contactmgmt/phone-status/+6141111111/Active"
 
-# Non-existent number
-curl -X PATCH "http://localhost:8080/contactmgmt/phone-status/+6141111111/InActive"
-
