@@ -11,6 +11,6 @@ Use this command to run the application ./mvnw spring-boot:run
 http://localhost:8080/h2-console/
 
 # Curl commands to check endpoints
-curl -X GET "http://localhost:8080/conatctmgmt/phone-details"
-curl -X GET "http://localhost:8080/phone-details?customer-id=cus1"
-curl -X PATCH "http://localhost:8080/phone-status/+61411111111/Active"
+curl -X GET "http://localhost:8080/contactmgmt/phone-details"
+curl -X GET "http://localhost:8080/contactmgmt/phone-details?customer-id=cus1"
+curl -X PATCH "http://localhost:8080/contactmgmt/phone-status/+61411111111/Active"
