@@ -15,7 +15,11 @@ curl -X GET "http://localhost:8080/contactmgmt/phone-details"
 curl -X GET "http://localhost:8080/contactmgmt/phone-details?customer-id=cus1"
 curl -X PATCH "http://localhost:8080/contactmgmt/phone-status/+61411111111/Active"
 
-# Some invalid scenarios for patch
+# Some invalid scenarios for API
+curl -X GET "http://localhost:8080/contactmgmt/phone-details?customer-id=xxx"
+curl -X PATCH "http://localhost:8080/contactmgmt/phone-status/+61411111111/Activ"
+curl -X PATCH "http://localhost:8080/contactmgmt/phone-status/+6141111111/Active"
+
 # Invalid status
 curl -X PATCH "http://localhost:8080/contactmgmt/phone-status/+61411111111/Activ"
 # Non-existent number
