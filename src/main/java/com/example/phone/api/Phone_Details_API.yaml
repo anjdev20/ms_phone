@@ -1,4 +1,6 @@
 openapi: 3.1.0
+x-stoplight:
+  id: wisvdyv8jnwga
 info:
   title: Phone_API
   version: '1.0'
@@ -65,8 +67,34 @@ paths:
           description: Phone status updated
         '400':
           description: Invalid status - valid statuses are Active/Inactive
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: integer
+                  errorMessage:
+                    type: string
+                x-examples:
+                  example-1:
+                    errorCode: 400
+                    errorMessage: Invalid status update requested
         '404':
           description: Invalid phone number
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: integer
+                  errorMessage:
+                    type: string
+                x-examples:
+                  example-1:
+                    errorCode: 404
+                    errorMessage: Phone number does not exist
   /contactmgmt/details:
     get:
       summary: Get all customer details from backend

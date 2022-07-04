@@ -2,6 +2,8 @@ package com.example.phone.service;
 
 import com.example.phone.entity.PhoneData;
 import com.example.phone.entity.PhoneDataResponse;
+import com.example.phone.exception.InvalidStatusUpdateException;
+import com.example.phone.exception.NoDataFoundException;
 import com.example.phone.repository.PhoneDataRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,8 @@ import java.util.List;
 @Slf4j
 public class PhoneServiceImpl implements PhoneService {
 
+    private static final String ACTIVE = "Active";
+    private static final String INACTIVE = "Inactive";
     //Autowiring phoneData repo
     @Autowired
     private PhoneDataRepository phoneDataRepository;
@@ -39,6 +43,10 @@ public class PhoneServiceImpl implements PhoneService {
             log.info("Retrieving all phone numbers for customer: " + cusId);
         /**Using a separate response object to send API response to make it more scalable*/
         List<PhoneData> phoneDataList = phoneDataRepository.findAll(Example.of(phoneData));
+        if (phoneDataList.size() == 0) {
+            log.error("Customer ID not found");
+            throw new NoDataFoundException("Customer ID not found");
+        }
         List<PhoneDataResponse> phoneDataResponse = new ArrayList<>(phoneDataList.size());
         log.info("Creating a new response object");
         for (PhoneData phone : phoneDataList) {
@@ -58,20 +66,21 @@ public class PhoneServiceImpl implements PhoneService {
         log.debug("Going to update status of phone number");
         //Check if phone number exists and status to be updated is valid
         PhoneData phoneData = phoneDataRepository.findByNumber(number);
-        if (phoneData != null) {
-            if (status.equals("Active") || status.equals("Inactive")) {
-                phoneDataRepository.updateStatus(status, number);
-                log.info("Status of phone number " + number + " updated to " + status);
-                //return success message
-                return new ResponseEntity("Phone status updated", HttpStatus.OK);
-            } else {
-                log.warn("Invalid status - valid statuses are Active/Inactive");
-                return new ResponseEntity("Invalid status - valid statuses are Active/Inactive", HttpStatus.BAD_REQUEST);
-            }
-
+        if (phoneData == null) {
+            /**If phone number does not exist*/
+            log.error("Phone number does not exist");
+            throw new NoDataFoundException("Phone number does not exist");
         }
-        //If phone number does not exist
-        log.warn("Phone number does not exist");
-        return new ResponseEntity("Phone number does not exist", HttpStatus.NOT_FOUND);
+        if (phoneData != null) {
+            /**If status received in path param is incorrect, respond with an error*/
+            if (!((status.equals(ACTIVE) || status.equals(INACTIVE)))) {
+                log.error("Invalid status - valid statuses are Active/InActive");
+                throw new InvalidStatusUpdateException("Invalid status update requested");
+            }
+        }
+        phoneDataRepository.updateStatus(status, number);
+        log.info("Status of phone number " + number + " updated to " + status);
+        //return success message
+        return new ResponseEntity("Phone status updated", HttpStatus.OK);
     }
 }

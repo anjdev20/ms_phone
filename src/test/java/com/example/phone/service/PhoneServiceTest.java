@@ -2,6 +2,8 @@ package com.example.phone.service;
 
 import com.example.phone.entity.PhoneData;
 import com.example.phone.entity.PhoneDataResponse;
+import com.example.phone.exception.InvalidStatusUpdateException;
+import com.example.phone.exception.NoDataFoundException;
 import com.example.phone.repository.PhoneDataRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -11,7 +13,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Example;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,6 +45,20 @@ class PhoneServiceTest {
     }
 
     @Test
+    void testNoCustomerIdFound() {
+        String cusId = "cus";
+        List<PhoneData> phonesFromDb = new ArrayList<PhoneData>();
+        Mockito.when(phoneDataRepository.findAll(any(Example.class))).thenReturn(phonesFromDb);
+        NoDataFoundException exception = Assertions.assertThrows(NoDataFoundException.class, () -> {
+            phoneService.getPhoneForUser(cusId);
+        });
+
+        String expectedMessage = "Customer ID not found";
+        String actualMessage = exception.getMessage();
+        Assertions.assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
     void testGetPhoneForAllUsers() {
         PhoneData phoneData = new PhoneData();
         List<PhoneData> phonesFromDb = Collections.singletonList(phoneData);
@@ -55,7 +74,8 @@ class PhoneServiceTest {
         String status = "Active";
         PhoneData phoneData = getPhoneData();
         Mockito.when(phoneDataRepository.findByNumber(any())).thenReturn(phoneData);
-        phoneService.activatePhone("+61411111111", "Active");
+        ResponseEntity actual = phoneService.activatePhone(number, status);
+        ResponseEntity expected = new ResponseEntity("Phone status updated", HttpStatus.OK);
         verify(phoneDataRepository, times(1)).updateStatus(any(), any());
     }
 
@@ -63,8 +83,15 @@ class PhoneServiceTest {
     void testActivateInvalidNumber() {
         String number = "+1111";
         String status = "Active";
+
         Mockito.when(phoneDataRepository.findByNumber(any())).thenReturn(null);
-        phoneService.activatePhone(number, status);
+        NoDataFoundException exception = Assertions.assertThrows(NoDataFoundException.class, () -> {
+            phoneService.activatePhone(number, status);
+        });
+
+        String expectedMessage = "Phone number does not exist";
+        String actualMessage = exception.getMessage();
+        Assertions.assertTrue(actualMessage.contains(expectedMessage));
         verify(phoneDataRepository, never()).updateStatus(any(), any());
     }
 
@@ -74,7 +101,12 @@ class PhoneServiceTest {
         String status = "Activ";
         PhoneData phoneData = getPhoneData();
         Mockito.when(phoneDataRepository.findByNumber(any())).thenReturn(phoneData);
-        phoneService.activatePhone(number, status);
+        InvalidStatusUpdateException exception = Assertions.assertThrows(InvalidStatusUpdateException.class, () -> {
+            phoneService.activatePhone(number, status);
+        });
+        String expectedMessage = "Invalid status update requested";
+        String actualMessage = exception.getMessage();
+        Assertions.assertTrue(actualMessage.contains(expectedMessage));
         verify(phoneDataRepository, never()).updateStatus(any(), any());
     }
 
